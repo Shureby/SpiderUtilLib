@@ -1,2 +1,2 @@
 # SpiderUtilLib
-A few useful utilities for Web Sipder
+A few useful utilities for Web Spider

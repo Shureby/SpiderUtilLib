@@ -338,52 +338,5 @@ class FileUtils:
 
 
 if __name__ == '__main__':
-	# print(__doc__)
-	# print(isinstance(FileUtils.File_Name_Cleanup(':><\n\\'), str))
-	# print(FileUtils.Remove_Duplicates_Orderly([1, 2, 2, 3, 2, 4, 4, 4, 5, 4, 7, 8, 8, 9, 8, 1],
-	# 										  preserve_first_encounter=True, preserve_original_list=True))
-	# print(FileUtils.Remove_Duplicates_Orderly([1, 2, 2, 3, 2, 4, 4, 4, 5, 4, 7, 8, 8, 9, 8, 1],
-	# 										  preserve_first_encounter=False, preserve_original_list=False))
-	# print(FileUtils.Search_File_By_Name('元尊.txt', 'D:\William\Python Download'))
-	#
-	# FileUtils.Text_File_Cleanup('D:\William\Python Download\笔趣阁\张小花\谁都别惹我.txt', '---.*?-----.*?\n',
-	# 							search_using_regex=True, preserve_original_file=True)
-	# print(FileUtils.Text_File_Search('D:\William\Python Download\笔趣阁\张小花\谁都别惹我.txt', '第.?章.*',
-	# 								 search_using_regex=True, search_from_front_to_back=True))
-	#
-	# print(FileUtils.Text_File_Search('D:\William\Python Download\笔趣阁\张小花\谁都别惹我.txt', '(第[0-9]+章)(.*)\n',
-	# 								 search_using_regex=True, search_from_front_to_back=False))
-	print(FileUtils.Text_File_Search_All('D:\William\Python Download\笔趣阁\张小花\谁都别惹我.txt', '第\d+章.+\n',
-										 search_using_regex=True, search_from_front_to_back=True))
-
-	print(FileUtils.Text_File_Search_All('D:\William\Python Download\笔趣阁\张小花\谁都别惹我.txt', '(第\d+章)(.+)\n$',
-										 search_using_regex=True, search_from_front_to_back=False))
-
-
-	def test_reverse_read():
-		with open('D:\William\Python Download\笔趣阁\排行榜单\灵剑尊.txt', 'r', encoding='utf-8') as fp:
-			for index, line in enumerate(FileUtils.Reverse_File_Reader(fp, '\r\n', False), 1):
-				pass
-			else:
-				print(index, [line])
-
-
-	def test_reverse_read2():
-		with open('D:\William\Python Download\笔趣阁\排行榜单\灵剑尊.txt', 'r', encoding='utf-8') as fp:
-			for index, line in enumerate(FileUtils.Reverse_File_Reader(fp), 1):
-				pass
-			else:
-				print(index, line)
-
-
-	import time
-
-	begin = time.time()
-	test_reverse_read()
-	time_save_memory = time.time() - begin
-
-	begin = time.time()
-	test_reverse_read2()
-	time_save_time = time.time() - begin
-	print(f'{time_save_memory=} , {time_save_time=}')
+	print(__doc__)
 	pass

@@ -1,6 +1,6 @@
 # -*- encoding:utf-8 -*-
 
-"""FileUtil
+"""FileUtils
 :cvar: 1.0.0
 This module contains a few utilities that can help you
 process local files easily.

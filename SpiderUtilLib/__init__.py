@@ -21,7 +21,7 @@ FileUtils contains fucntions that are useful for processing
 locally stored data files.
 
 """
-from FileUtils import *
+from FileUtils import FileUtils
 
 if __name__ == '__main__':
 	print(__doc__)

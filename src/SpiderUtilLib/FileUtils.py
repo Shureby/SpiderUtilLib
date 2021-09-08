@@ -1,24 +1,24 @@
+#  Copyright 2021 Wei WANG of Ezy App Co. Pty Ltd, Australia
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 # -*- encoding:utf-8 -*-
 
 """FileUtils
-:cvar: 1.0.0
+:cvar: 1.0.2
 This module contains a few utilities that can help you
 process local files easily.
 """
-
-#  Copyright 2021 Wei WANG of Ezy App Co. Pty Ltd, Australia
-#
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#     Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
 
 import os
 import shutil
@@ -29,13 +29,17 @@ from operator import methodcaller, sub
 import codecs
 
 
-
 class FileUtils:
 	@classmethod
-	def File_Name_Cleanup(cls, name: str) -> str:
-		"""Clean up the illegal ASCII characters in the name
-		string and return a new string that keeps the same
-		format using legal unicode characters.
+	def file_name_cleanup(cls, name: str, remove_left_whitespace: bool = True,
+						  remove_right_whitespace: bool = True) -> str:
+		"""
+		Clean up the illegal ASCII characters in the name string and return a new string
+		that keeps the same format using legal unicode characters.
+		:param name: a possible filename
+		:param remove_left_whitespace: remove the white space from the left of above given name
+		:param remove_right_whitespace: remove the white space from the right of above given name
+		:return: a cleaned filename with will accepted by the OS filesystem
 		"""
 		new_name = name
 		new_name = new_name.replace('|', '-')
@@ -44,15 +48,36 @@ class FileUtils:
 		new_name = new_name.replace('/', '╱')
 		new_name = new_name.replace('\\', '╲')
 		new_name = new_name.replace('\n', '_')
+		new_name = new_name.replace('\r', '_')
 		new_name = new_name.replace(':', '：')
 		new_name = new_name.replace('>', '〉')
 		new_name = new_name.replace('<', '〈')
-		new_name = new_name.replace('"', '\'')
+		new_name = new_name.replace('&nbsp;', ' ')
+		replace_by = "“”"
+		count = 0
+		while new_name.find('"') > -1:
+			new_name = new_name.replace('"', replace_by[count % 2], 1)
+			count += 1
+		if remove_left_whitespace:
+			new_name = new_name.lstrip()
+		if remove_right_whitespace:
+			new_name = new_name.rstrip()
+
 		return new_name
 
 	@classmethod
-	def Remove_Duplicates_Orderly(cls, list_with_duplicates, preserve_first_encounter=True,
-								  preserve_original_list=False):
+	def remove_duplicates_orderly(cls, list_with_duplicates: list, preserve_first_encounter: bool = True,
+								  preserve_original_list: bool = False) -> list:
+		"""
+		Remove duplicates from a list without change it original order
+		:param list_with_duplicates: a list with duplicates
+		:param preserve_first_encounter: True - when remove duplicates, keep the first encountered duplicate element; or
+										False - when remove duplicates, keep the last encountered duplicate element.
+		:param preserve_original_list: 	True - list_with_duplicates will remain unchanged after the execution of the function
+										False - list_with_duplicates will be a duplicate-free list itself.
+		:return: A new list with the duplicates removed without breaking its order
+
+		"""
 		list_set = set(list_with_duplicates)
 		list_new = list_with_duplicates.copy() if preserve_original_list else list_with_duplicates
 		if len(list_new) == len(list_set):  # No extra
@@ -70,10 +95,11 @@ class FileUtils:
 		return list_new
 
 	@classmethod
-	def Search_File_By_Name(cls, name, root_path, return_path_only=True, return_all_files=False,
-							allow_partial_name=False):
-		""":cvar:1.0
-		Serach for file with  by walk through root_path and its sub directories, return
+	def search_file_by_name(cls, name: str, root_path: str, return_path_only: bool = True,
+							return_all_files: bool = False,
+							allow_partial_name: bool = False):
+		"""
+		Search for file with  by walk through root_path and its sub directories, return
 		the absolute path of the file if exists.
 		:param name: File name you want to search for
 		:param root_path: Search file name inside this folder and its sub folders
@@ -82,16 +108,15 @@ class FileUtils:
 		:param return_all_files: If True, return a list of all founded files in a list
 		:param allow_partial_name: If True, allow partial file name match, AND THIS WILL
 				FORCE return_path_only TO BE SET TO False
-		:return: return first found file's absolute path or None if not found, when
-				 return_all_files is set to False, otherwise, return a list of all
-				 found files
+		:return: return first found file's absolute path or None if not found, when return_all_files is set to False;
+				otherwise, return a list of all found files
 		"""
 
 		# if allow_partial_name and return_path_only:
 		# 	import warnings
 		# 	warnings.warn(
 		# 		'{}.{} - Due to "allow_partial_name" is set to True, "return_path_only" has been set to False '.format(
-		# 			__name__, cls.Search_File_By_Name.__name__), RuntimeWarning)
+		# 			__name__, cls.search_file_by_name.__name__), RuntimeWarning)
 		result_list = []
 		for dirpath, dirnames, filenames in os.walk(root_path):
 			for filename in filenames:
@@ -110,21 +135,20 @@ class FileUtils:
 		return None
 
 	@classmethod
-	def Text_File_Cleanup(cls, file, search_for, replace_as='', encoding='utf-8', search_using_regex=False,
-						  preserve_original_file=False):
-		""":cvar:1.0
-		Serach text inside file using pure_text or regular expression (RE) and replace
-		it.
+	def text_file_cleanup(cls, file: str, search_for: str, replace_as: str = '', encoding: str = 'utf-8',
+						  search_using_regex: bool = False,
+						  preserve_original_file: bool = False, auto_replace_nbsp=True) -> bool:
+		"""
+		Search text inside file using pure_text or regular expression (RE) and replace it.
 		:param file: File with its path
 		:param search_for: The text you are searching for
 		:param replace_as: The text you are replacing as
 		:param encoding: The encoding of the text file
-		:param search_using_regex: True: The search_for parameter is a RE, or
-								  False: The search_for parameters is a str
-		:param preserve_original_file: True: A extra file.old file will be created
-											  after replacement completed
-									  False: The original file will be cleaned and
-									          gone for good
+		:param search_using_regex: 	True - The search_for parameter is a RE, or
+									False - The search_for parameters is a str
+		:param preserve_original_file: 	True - A extra file.old file will be created after replacement completed
+										False - The original file will be cleaned and gone for good
+		:param auto_replace_nbsp:
 		:return: return True if complete replacement successfully, or False if failed
 		"""
 
@@ -133,6 +157,8 @@ class FileUtils:
 			with open(file + '.origin', mode='r', encoding=encoding) as file_reader, open(file, mode='w',
 																						  encoding=encoding) as file_writer:
 				for line in file_reader:
+					if auto_replace_nbsp:
+						line.replace('&nbsp;', ' ')
 					if not search_using_regex:
 						file_writer.write(line.replace(search_for, replace_as))
 					else:
@@ -146,23 +172,23 @@ class FileUtils:
 		return True
 
 	@classmethod
-	def Reverse_File_Reader(cls, file_object,
-							lines_separator='\n',
-							keep_lines_separator=True,
-							save_memory=True):
-		""":cvar: 1.0.0
-		   :param file_object: Text File Stream (file opened in 'rt' mode)
-		   :param lines_separator: Line separator using after file reversed
-		   :param keep_lines_separator: True - Keep above separator at the end of each line, or
-		   							   False - Remove any line separator
-		   :param save_memory: True - Save memory by reading file using bitstream, slower by works for any file
-		   					  False - Read the while file in memory and reverse it, faster but limited to small file
-		   :return: read file_object from the back towards the front, iterate file line by line
-
+	def reverse_file_reader(cls, file_object: object,
+							lines_separator: str = '\n',
+							keep_lines_separator: bool = True,
+							save_memory: bool = True):
+		"""
 		Read text file in reversed direction, return iteration of lines
 		Original idea from: https://stackoverflow.com/questions/2301789/how-to-read-a-file-in-reverse-order/
 		Modified and tested for UFT-8 based Text File (in Chinese particularly), but should work for most encodings
+		:param file_object: Text File Stream (file opened in 'rt' mode)
+		:param lines_separator: Line separator using after file reversed
+		:param keep_lines_separator: 	True - Keep above separator at the end of each line, or
+										False - Remove any line separator
+		:param save_memory: 	True - Save memory by reading file using bitstream, slower by works for any file
+								False - Read the while file in memory and reverse it, faster but limited to small file
+		:return: iteration each line of the file from the back towards the front
 		"""
+		f = open(filename, 'w')
 
 		def ceil_division(left_number, right_number):
 			"""
@@ -279,15 +305,15 @@ class FileUtils:
 					yield line.rstrip()
 
 	@classmethod
-	def Text_File_Search_All(cls, file, search_for, encoding='utf-8', search_using_regex=False,
+	def text_file_search_all(cls, file, search_for, encoding='utf-8', search_using_regex=False,
 							 search_from_front_to_back=False, count=0):
-		""":cvar:1.0
-		Serach text inside file using pure_text or regular expression (RE)
+		"""
+		Search text inside file using pure_text or regular expression (RE)
 		:param file: File with its path
 		:param search_for: The text you are searching for
 		:param search_using_regex: True: The search_for parameter is a RE, or False: The search_for parameters is a str
-		:param search_from_front_to_back: True: Search the file from the start towards the end, or
-										 False: Search the file from the end towards the start
+		:param search_from_front_to_back: 	True: Search the file from the start towards the end, or
+											False: Search the file from the end towards the start
 		:param count: Maximum Occurrence needed, 0 will return all
 		:return: return a list of found strings, or None if not found
 		"""
@@ -297,7 +323,7 @@ class FileUtils:
 		try:
 			result = []
 			with open(file, mode='r', encoding=encoding) as file_reader:
-				for line in file_reader if search_from_front_to_back else cls.Reverse_File_Reader(file_reader,
+				for line in file_reader if search_from_front_to_back else cls.reverse_file_reader(file_reader,
 																								  save_memory=True):
 					if not search_using_regex:
 						if not line.find(search_for) == -1:
@@ -319,19 +345,20 @@ class FileUtils:
 			return None
 
 	@classmethod
-	def Text_File_Search(cls, file, search_for, encoding='utf-8', search_using_regex=False,
-						 search_from_front_to_back=False):
-		""":cvar:1.0
-		Serach text inside file using pure_text or regular expression (RE)
+	def text_file_search(cls, file: str, search_for: str, encoding: str = 'utf-8', search_using_regex: bool = False,
+						 search_from_front_to_back: bool = False):
+		"""
+		Search text inside file using pure_text or regular expression (RE)
 		:param file: File with its path
 		:param search_for: The text you are searching for
+		:param encoding: what encoding to use for the file
 		:param search_using_regex: True: The search_for parameter is a RE, or False: The search_for parameters is a str
-		:param search_from_front_to_back: True: Search the file from the start towards the end, or
-										 False: Search the file from the end towards the start
+		:param search_from_front_to_back: 	True: Search the file from the start towards the end, or
+											False: Search the file from the end towards the start
 		:return: return the first found string, or None if not found
 		"""
 
-		result = cls.Text_File_Search_All(file, search_for, encoding, search_using_regex,
+		result = cls.text_file_search_all(file, search_for, encoding, search_using_regex,
 										  search_from_front_to_back, count=1)
 
 		return result[0] if result else None
@@ -339,4 +366,6 @@ class FileUtils:
 
 if __name__ == '__main__':
 	print(__doc__)
+	print(FileUtils.file_name_cleanup(
+		'This is a test of "WORDS" and "Letters" with quotation marks and symbols such as "<>?|*\\&nbsp;/\n:\r"!'))
 	pass

@@ -16,32 +16,31 @@
 #   limitations under the License.
 
 
-
 """Setup for SpiderUtilLib"""
 
 import setuptools
 
 with open("README.md", "r") as fh:
-    long_description = fh.read()
+	long_description = fh.read()
 
 setuptools.setup(
-    name="SpiderUtilLib",
-    version="0.5.5",
-    author="Wei WANG",
-    author_email="wwang@ezyappco.com",
-    description="Spider Utilities Library",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/Shureby/SpiderUtilLib",
-    project_urls={
-        "Bug Tracker": "https://github.com/Shureby/SpiderUtilLib/issues",
-    },
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires='>=3.6',
+	name="SpiderUtilLib",
+	version="0.9.9",
+	author="Wei WANG",
+	author_email="wwang@ezyappco.com",
+	description="Spider Utilities Library",
+	long_description=long_description,
+	long_description_content_type="text/markdown",
+	url="https://github.com/Shureby/SpiderUtilLib",
+	project_urls={
+		"Bug Tracker": "https://github.com/Shureby/SpiderUtilLib/issues",
+	},
+	package_dir={"": "src"},
+	packages=setuptools.find_packages(where="src"),
+	classifiers=[
+		"Programming Language :: Python :: 3",
+		"License :: OSI Approved :: Apache Software License",
+		"Operating System :: OS Independent",
+	],
+	python_requires='>=3.6',
 )

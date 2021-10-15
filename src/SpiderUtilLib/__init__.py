@@ -12,17 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""This is a package containing multiple utilities that are
+"""
+# SpiderUtilLib
+This is a package containing multiple utilities that are
 useful for web crawling and related data processing.
 It has two major class: WebUtils and FileUtils.
 
-WebUtils contains functions that are useful for web spiders,
-FileUtils contains fucntions that are useful for processing
-locally stored data files.
+* WebUtils contains functions that are useful for web spiders,
+* FileUtils contains functions that are useful for processing locally stored data files.
 """
-from .FileUtils import FileUtils
+from .FileUtils import FileUtils as FU
+from .WebUtils import WebUtils as WU
 
 if __name__ == '__main__':
 	print(__doc__)
-	print(FileUtils.search_file_by_name('.py', '', return_all_files=True, allow_partial_name=True,
+	print(FU.search_file_by_name('.py', '', return_all_files=True, allow_partial_name=True,
 										return_path_only=False))
+	print(WU.md5_hash('I ❤ Python'))
